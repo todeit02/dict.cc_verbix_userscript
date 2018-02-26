@@ -5,6 +5,7 @@
 // @grant				GM_xmlhttpRequest
 // @include				/^https:\/\/(?:(?:([a-z]){2}-?([a-z]){2})|(www))\.dict\.cc\/\?s=.*/
 // @connect				api.verbix.com
+// @connect 			raw.githubusercontent.com
 // @require 			https://code.jquery.com/jquery-3.3.1.js
 // ==/UserScript==
 
@@ -28,9 +29,7 @@ const verbixLanguageCodes =
 	"no": "nob",
 	"pt": "por",
 	"ro": "ron",
-	"ru": "rus",
-	"sv": "swe",
-	"tr": "tur"
+	"sv": "swe"
 };
 
 const usingTemplateTenses = 
@@ -41,12 +40,14 @@ const usingTemplateTenses =
 ];
 
 	var languagePair;
+	var languagePairTenseNames;
 	var hoveredWordLink;
 	var openTooltips = [];
 	var verbixTenseTables = [];
 
 $(function(){
 	languagePair = getLanguagePair();
+	languagePairTenseNames = getLanguagePairTenseNames();
 	linkWordsToVerbix();
 });
 
@@ -163,6 +164,23 @@ function getLanguagePair()
 		languages.push("en");
 	}
 	return languages;
+}
+
+function getLanguagePairTenseNames(languagePair)
+{
+	const tenseNamesUrl = "https://raw.githubusercontent.com/todeit02/dict.cc_verbix_userscript/master/tense_names.json";
+	var tenseNames;
+	
+	$.getJSON( tenseNamesUrl, function(data) {
+		
+		languagePair.forEach(function(language)
+		{
+			if(data[language]) tenseNames[language] = data[language];
+			else tenseNames[language] = data["es"];
+		});
+	});
+	
+	return tenseNames;
 }
 	
 function isTableOfTense(templateTenseName)

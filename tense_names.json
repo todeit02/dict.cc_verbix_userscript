@@ -1,0 +1,72 @@
+{
+	"de": {
+		"Presente": "Präsens",
+		"Perfecto": "Perfekt",
+		"Imperfecto": "Präteritum"
+	},
+	"en": {
+		"Presente": "Present",
+		"Perfecto": "Perfect",
+		"Imperfecto": "Past"
+	},
+	"da": {
+		"Presente": "Præsens",
+		"Perfecto": "Perfektum",
+		"Imperfecto": "Præteritum"
+	},
+	"es": {
+		"Presente": "Presente",
+		"Perfecto": "Perfecto",
+		"Imperfecto": "Imperfecto"
+	},
+	"fi": {
+		"Presente": "Preesens",
+		"Perfecto": "Perfekti",
+		"Imperfecto": "Imperfekti"
+	},
+	"fr": {
+		"Presente": "Présent",
+		"Perfecto": "Passé composé",
+		"Imperfecto": "Imparfait"
+	},
+	"hu": {
+		"Presente": "Present Indefinite",
+		"Perfecto": "Conjunctive Indefinite",
+		"Imperfecto": "Past Indefinite"
+	},
+	"it": {
+		"Presente": "Presente",
+		"Perfecto": "Passato prossimo",
+		"Imperfecto": "Imperfetto"
+	},
+	"la": {
+		"Presente": "Tempus praesēns",
+		"Perfecto": "Tempus praeteritum perfectum",
+		"Imperfecto": "Tempus praeteritum imperfectum"
+	},
+	"nl": {
+		"Presente": "Onvoltooid tegenwoordige tijd",
+		"Perfecto": "Voltooid tegenwoordige tijd",
+		"Imperfecto": "Onvoltooid verleden tijd"
+	},
+	"no": {
+		"Presente": "Presens",
+		"Perfecto": "Perfektum",
+		"Imperfecto": "Preteritum"
+	},
+	"pt": {
+		"Presente": "Present",
+		"Perfecto": "Perfeito",
+		"Imperfecto": "Imperfeito"
+	},
+	"ro": {
+		"Presente": "Prezent",
+		"Perfecto": "Perfect compus",
+		"Imperfecto": "Imperfect"
+	},
+	"sv": {
+		"Presente": "Presens",
+		"Perfecto": "Perfekt",
+		"Imperfecto": "Preteritum"
+	}
+}
