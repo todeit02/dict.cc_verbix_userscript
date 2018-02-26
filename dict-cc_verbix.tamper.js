@@ -39,15 +39,15 @@ const usingTemplateTenses =
 	"Imperfecto"
 ];
 
-	var languagePair;
-	var languagePairTenseNames;
-	var hoveredWordLink;
-	var openTooltips = [];
-	var verbixTenseTables = [];
+var languagePair = [];
+var languagePairTenseNames = {};
+var hoveredWordLink;
+var openTooltips = [];
+var verbixTenseTables = [];
 
 $(function(){
 	languagePair = getLanguagePair();
-	languagePairTenseNames = getLanguagePairTenseNames();
+	loadLanguagePairTenseNames(languagePair);
 	linkWordsToVerbix();
 });
 
@@ -166,21 +166,19 @@ function getLanguagePair()
 	return languages;
 }
 
-function getLanguagePairTenseNames(languagePair)
+function loadLanguagePairTenseNames(languagePair)
 {
 	const tenseNamesUrl = "https://raw.githubusercontent.com/todeit02/dict.cc_verbix_userscript/master/tense_names.json";
-	var tenseNames;
 	
-	$.getJSON( tenseNamesUrl, function(data) {
+	$.getJSON(tenseNamesUrl, function(data) {
+		var defaultTenseNames = data["es"];
 		
 		languagePair.forEach(function(language)
 		{
-			if(data[language]) tenseNames[language] = data[language];
-			else tenseNames[language] = data["es"];
+			if(data[language]) languagePairTenseNames[language] = data[language];
+			else languagePairTenseNames[language] = defaultTenseNames;
 		});
 	});
-	
-	return tenseNames;
 }
 	
 function isTableOfTense(templateTenseName)
