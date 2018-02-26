@@ -11,31 +11,39 @@
 const dictWordButtonTableClass = "td7cml";
 const dictWordTextTableDataClass = "td7nl";
 const dictItemTableLineIdSuffix = "tr";
+
 const verbixLanguageCodes = 
-	{
-		"de": "deu",
-		"en": "eng",
-		"da": "dan",
-		"es": "spa",
-		"fi": "fin",
-		"fr": "fra",
-		"hu": "hun",
-		"is": "isl",
-		"it": "ita",
-		"la": "lat",
-		"nl": "nld",
-		"no": "nob",
-		"pt": "por",
-		"ro": "ron",
-		"ru": "rus",
-		"sv": "swe",
-		"tr": "tur"
-	};
+{
+	"de": "deu",
+	"en": "eng",
+	"da": "dan",
+	"es": "spa",
+	"fi": "fin",
+	"fr": "fra",
+	"hu": "hun",
+	"is": "isl",
+	"it": "ita",
+	"la": "lat",
+	"nl": "nld",
+	"no": "nob",
+	"pt": "por",
+	"ro": "ron",
+	"ru": "rus",
+	"sv": "swe",
+	"tr": "tur"
+};
+
+const usingTemplateTenses = 
+[
+	"Presente",
+	"Perfecto",
+	"Imperfecto"
+];
 
 	var languagePair;
 	var hoveredWordLink;
 	var openTooltips = [];
-	var verbixPresentTable;
+	var verbixTenseTables = [];
 
 $(function(){
 	languagePair = getLanguagePair();
@@ -62,7 +70,7 @@ function createTooltip()
 	
 	if(verbixLanguage == null) return;
 	
-	loadVerbixConjugationList(verbixLanguage, wordText);
+	loadVerbixConjugationLists(verbixLanguage, wordText);
 }
 
 function showTooltip()
@@ -70,7 +78,13 @@ function showTooltip()
 	console.log("Show verbix tooltip.");
 	var tooltip = $("<br /><div></div>").insertAfter(hoveredWordLink);
 	openTooltips.push(tooltip);
-	tooltip.append(verbixPresentTable);
+	
+	verbixTenseTables.forEach(function(tenseTable, index){
+		if(index > 0) tooltip.append("<br />");
+		tooltip.append("<b>" + usingTemplateTenses[index] + "</b>");
+		tooltip.append(tenseTable);
+	});
+	
 	tooltip.css({
 		"display": "inline-block",
 		"opacity": "0",
@@ -89,9 +103,11 @@ function removeTooltip()
 	openTooltips.forEach(function(tooltip){
 		tooltip.remove();
 	});
+	openTooltips = [];
+	verbixTenseTables = [];
 }
 
-function loadVerbixConjugationList(language, verb)
+function loadVerbixConjugationLists(language, verb)
 {
 	const verbixApiUrl = "https://api.verbix.com/conjugator/html";
 	const verbixTableTemplateUrl = "http://tools.verbix.com/webverbix/personal/template.htm";
@@ -105,7 +121,12 @@ function loadVerbixConjugationList(language, verb)
 		url: verbixUrl,
 		onload: function(response) {
 			var verbixContent = new DOMParser().parseFromString(response.responseText, "text/html");
-			verbixPresentTable = $("table:eq(1)", verbixContent).find("tr:eq(3)").find(".verbtense:first");
+			
+			usingTemplateTenses.forEach(function(tenseName)
+			{
+				var tenseTable = $(".verbtense", verbixContent).filter(isTableOfTense(tenseName)).first();
+				verbixTenseTables.push(tenseTable);
+			});			
 			showTooltip();
 		}
 	});
@@ -142,4 +163,17 @@ function getLanguagePair()
 		languages.push("en");
 	}
 	return languages;
+}
+	
+function isTableOfTense(templateTenseName)
+{
+	return function()
+	{
+		var parentText = $(this).parent().text();		
+		while(parentText.charAt(0) === '\r' || parentText.charAt(0) === '\n')
+		{
+			parentText = parentText.substr(1);
+		}		
+		return parentText.substring(0, templateTenseName.length) === templateTenseName;
+	};
 }
