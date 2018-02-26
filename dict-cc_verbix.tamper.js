@@ -57,7 +57,6 @@ function createTooltip()
 	var wordText = hoveredWordLink.text();
 	var isLeftColumn = hoveredWordLink.parent().prev().attr("class") === dictWordButtonTableClass;
 	
-	const languagePairLength = 4;
 	var dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
 	var verbixLanguage = verbixLanguageCodes[dictLanguage];
 	
