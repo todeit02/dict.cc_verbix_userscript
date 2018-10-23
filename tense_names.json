@@ -1,72 +1,128 @@
 {
 	"de": {
-		"Presente": "Präsens",
-		"Perfecto": "Perfekt",
-		"Imperfecto": "Präteritum"
+		"tenses":
+		{
+			"Presente": "Präsens",
+			"Perfecto": "Perfekt",
+			"Imperfecto": "Präteritum"
+		},
+		"moods":
+		{
+			"Indicativo": "Indikativ",
+			"Subjuntivo": "Konjunktiv",
+			"Condicional": "Konditional",
+			"Imperativo": "Imperativ"
+		}
 	},
 	"en": {
-		"Presente": "Present",
-		"Perfecto": "Perfect",
-		"Imperfecto": "Past"
+		"tenses":
+		{
+			"Presente": "Present",
+			"Perfecto": "Perfect",
+			"Imperfecto": "Past"
+		}
 	},
 	"da": {
-		"Presente": "Præsens",
-		"Perfecto": "Perfektum",
-		"Imperfecto": "Præteritum"
+		"tenses":
+		{
+			"Presente": "Præsens",
+			"Perfecto": "Perfektum",
+			"Imperfecto": "Præteritum"
+		}
 	},
 	"es": {
-		"Presente": "Presente",
-		"Perfecto": "Perfecto",
-		"Imperfecto": "Imperfecto"
+		"tenses":
+		{
+			"Presente": "Presente",
+			"Perfecto": "Perfecto",
+			"Imperfecto": "Imperfecto"
+		},
+		"moods":
+		{
+			"Indicativo": "Indikativ",
+			"Subjuntivo": "Konjunktiv",
+			"Condicional": "Konditional",
+			"Imperativo": "Imperativ"
+		}
 	},
 	"fi": {
-		"Presente": "Preesens",
-		"Perfecto": "Perfekti",
-		"Imperfecto": "Imperfekti"
+		"tenses":
+		{
+			"Presente": "Preesens",
+			"Perfecto": "Perfekti",
+			"Imperfecto": "Imperfekti"
+		}
 	},
 	"fr": {
-		"Presente": "Présent",
-		"Perfecto": "Passé composé",
-		"Imperfecto": "Imparfait"
+		"tenses":
+		{
+			"Presente": "Présent",
+			"Perfecto": "Passé composé",
+			"Imperfecto": "Imparfait"
+		}
 	},
 	"hu": {
-		"Presente": "Present Indefinite",
-		"Perfecto": "Conjunctive Indefinite",
-		"Imperfecto": "Past Indefinite"
+		"tenses":
+		{
+			"Presente": "Present Indefinite",
+			"Perfecto": "Conjunctive Indefinite",
+			"Imperfecto": "Past Indefinite"
+		}
 	},
 	"it": {
-		"Presente": "Presente",
-		"Perfecto": "Passato prossimo",
-		"Imperfecto": "Imperfetto"
+		"tenses":
+		{
+			"Presente": "Presente",
+			"Perfecto": "Passato prossimo",
+			"Imperfecto": "Imperfetto"
+		}
 	},
 	"la": {
-		"Presente": "Tempus praesēns",
-		"Perfecto": "Tempus praeteritum perfectum",
-		"Imperfecto": "Tempus praeteritum imperfectum"
+		"tenses":
+		{
+			"Presente": "Tempus praesēns",
+			"Perfecto": "Tempus praeteritum perfectum",
+			"Imperfecto": "Tempus praeteritum imperfectum"
+		}
 	},
 	"nl": {
-		"Presente": "Onvoltooid tegenwoordige tijd",
-		"Perfecto": "Voltooid tegenwoordige tijd",
-		"Imperfecto": "Onvoltooid verleden tijd"
+		"tenses":
+		{
+			"Presente": "Onvoltooid tegenwoordige tijd",
+			"Perfecto": "Voltooid tegenwoordige tijd",
+			"Imperfecto": "Onvoltooid verleden tijd"
+		}
 	},
 	"no": {
-		"Presente": "Presens",
-		"Perfecto": "Perfektum",
-		"Imperfecto": "Preteritum"
+		"tenses":
+		{
+			"Presente": "Presens",
+			"Perfecto": "Perfektum",
+			"Imperfecto": "Preteritum"
+		}
 	},
 	"pt": {
-		"Presente": "Present",
-		"Perfecto": "Perfeito",
-		"Imperfecto": "Imperfeito"
+		"tenses":
+		{
+			"Presente": "Present",
+			"Perfecto": "Perfeito",
+			"Imperfecto": "Imperfeito"
+		}
 	},
 	"ro": {
-		"Presente": "Prezent",
-		"Perfecto": "Perfect compus",
-		"Imperfecto": "Imperfect"
+		"tenses":
+		{
+			"Presente": "Prezent",
+			"Perfecto": "Perfect compus",
+			"Imperfecto": "Imperfect"
+		}
 	},
 	"sv": {
-		"Presente": "Presens",
-		"Perfecto": "Perfekt",
-		"Imperfecto": "Preteritum"
+		"tenses":
+		{
+			"Presente": "Presens",
+			"Perfecto": "Perfekt",
+			"Imperfecto": "Preteritum"
+		}
 	}
 }

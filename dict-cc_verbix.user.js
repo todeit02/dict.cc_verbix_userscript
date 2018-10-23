@@ -53,15 +53,14 @@ const usingTemplateMoodTenses =
 
 
 let languagePair = [];
-let languagePairTenseNames = {};
+let templateHeadingsTranslations = {};
 let hoveredWordLink;
 let openTooltips = [];
-let verbixTenseTables = [];
 
 
 $(function(){
 	languagePair = getLanguagePair();
-	loadLanguagePairTenseNames(languagePair);
+	loadTemplateHeadingsTranslations();
 	linkWordsToVerbix();
 });
 
@@ -69,7 +68,7 @@ $(function(){
 function linkWordsToVerbix()
 {	  
   let dictItemTableLines = $("div[id='maincontent']").find("tr" + "[id^='" + dictItemTableLineIdSuffix + "']");
-  let dictWordLinks = dictItemTableLines.find("a").filter(() => $(this).text().length > 0);
+  let dictWordLinks = dictItemTableLines.find("a").filter(function(){ return $(this).text().length > 0; });
   
   dictWordLinks.hover(createTooltip, removeTooltip);
 }
@@ -83,22 +82,19 @@ function createTooltip()
 	let isLeftColumn = hoveredWordLink.parent().prev().attr("class") === dictWordButtonTableClass;
 	
 	let dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
-	let verbixLanguage = verbixLanguageCodes[dictLanguage];
 	
-	if(verbixLanguage == null) return;
-	
-	loadVerbixConjugationLists(verbixLanguage, wordText);
+	loadVerbixConjugationLists(dictLanguage, wordText);
 }
 
 
-function showTooltip()
+function showTooltip(tenseTablesHtml)
 {		
 	let tooltip = $("<br /><div></div>").insertAfter(hoveredWordLink);
 	openTooltips.push(tooltip);
 	
-	verbixTenseTables.forEach(function(tenseTable, index){
+	tenseTablesHtml.forEach(function(tenseTable, index){
 		if(index > 0) tooltip.append("<br />");
-		tooltip.append("<b>" + usingTemplateMoodTenses[index][1] + " (" + usingTemplateMoodTenses[index][0] + ")</b>");
+
 		tooltip.append(tenseTable);
 	});
 	
@@ -122,38 +118,48 @@ function removeTooltip()
 		tooltip.remove();
 	});
 	openTooltips = [];
-	verbixTenseTables = [];
 }
 
 
-function loadVerbixConjugationLists(language, verb)
+function loadVerbixConjugationLists(dictLanguage, verb)
 {
-	let getQuery = "language=" + language + "&tableurl=" + verbixTableTemplateUrl + "&verb=" + verb;
+	if(verbixLanguageCodes[dictLanguage] == null) return;
+
+	let getQuery = "language=" + verbixLanguageCodes[dictLanguage] + "&tableurl=" + verbixTableTemplateUrl + "&verb=" + verb;
 	let verbixUrl = verbixApiUrl + '?' + getQuery;
 	
 	GM_xmlhttpRequest({
 		method: "GET",
 		url: verbixUrl,
-		onload: function(response) {
+		onload: response => {
 			let verbixContent = new DOMParser().parseFromString(response.responseText, "text/html");
-			
+			let conjugationTables = [];
+
 			usingTemplateMoodTenses.forEach(function(moodTensePair)
 			{
 				const mood = moodTensePair[0];
+				const translatedMood = translateTemplateWord(dictLanguage, "mood", mood);
 				const tense = moodTensePair[1];
 				let moodTables = $(".verbtense", verbixContent).filter(isTableOfMood(mood));
 
 				if(moodTensePair[1] != null && moodTensePair.length > 0)
 				{
-					let tenseTable = moodTables.filter(isTableOfTense(tense));
-					verbixTenseTables.push(tenseTable);
+					const translatedTense = translateTemplateWord(dictLanguage, "tense", tense);
+					const $tenseTable = moodTables.filter(isTableOfTense(tense));
+					const $heading = $("<b>" + translatedTense + " (" + translatedMood + ")</b>");
+
+					conjugationTables.push($heading)
+					conjugationTables.push($tenseTable);
 				}
 				else
 				{
-					verbixTenseTables.push(moodTables);
+					const $heading = $("<b>" + translatedMood + "</b>");
+
+					conjugationTables.push($heading)
+					conjugationTables.push(moodTables);
 				}
-			});			
-			showTooltip();
+			});
+			showTooltip(conjugationTables);
 		}
 	});
 }
@@ -193,17 +199,23 @@ function getLanguagePair()
 }
 
 
-function loadLanguagePairTenseNames(languagePair)
+function loadTemplateHeadingsTranslations()
 {
-	$.getJSON(tenseNamesUrl, data => {
-		let defaultTenseNames = data["es"];
-		
-		languagePair.forEach(function(language)
-		{
-			if(data[language]) languagePairTenseNames[language] = data[language];
-			else languagePairTenseNames[language] = defaultTenseNames;
-		});
+	$.getJSON(tenseNamesUrl, data =>
+	{
+		templateHeadingsTranslations = data;
 	});
+}
+
+
+function translateTemplateWord(dictLanguage, verbAspect, word)
+{
+	verbAspect += 's';
+	const fallbackTranslations = templateHeadingsTranslations["es"];
+	const usingTranslations = templateHeadingsTranslations[dictLanguage] || fallbackTranslations;
+	const usingAspect = usingTranslations[verbAspect] || fallbackTranslations[verbAspect];
+	
+	return usingAspect[word];
 }
 
 
