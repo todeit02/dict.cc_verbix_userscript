@@ -3,14 +3,25 @@
 // @namespace	        https://github.com/todeit02/dict.cc_verbix_userscript
 // @description	        Injects verb conjugation tables from Verbix on dict.cc
 // @grant				GM.xmlHttpRequest
+// @grant				GM_xmlhttpRequest
 // @include				/^https:\/\/(?:(?:([a-z]){2}-?([a-z]){2})|(www))\.dict\.cc\/\?s=.*/
+// @connect				api.verbix.com
+// @connect 			raw.githubusercontent.com
 // @require 			https://code.jquery.com/jquery-3.3.1.js
 // ==/UserScript==
+
+// choose correct function for Greasemonkey/Tampermonkey
+if(typeof GM_xmlhttpRequest !== "function") GM_xmlhttpRequest = GM.xmlHttpRequest;
+
+const tenseNamesUrl = "https://raw.githubusercontent.com/todeit02/dict.cc_verbix_userscript/master/tense_names.json";
+const verbixApiUrl = "https://api.verbix.com/conjugator/html";
+const verbixTableTemplateUrl = "http://tools.verbix.com/webverbix/personal/template.htm";
 
 const dictWordButtonTableClass = "td7cml";
 const dictWordTextTableDataClass = "td7nl";
 const dictItemTableLineIdSuffix = "tr";
-
+			
+	
 const verbixLanguageCodes = 
 {
 	"de": "deu",
@@ -30,18 +41,23 @@ const verbixLanguageCodes =
 	"sv": "swe"
 };
 
-const usingTemplateTenses = 
+
+const usingTemplateMoodTenses = 
 [
-	"Presente",
-	"Perfecto",
-	"Imperfecto"
+	["Indicativo", "Presente"],
+	["Indicativo", "Perfecto"],
+	["Indicativo", "Imperfecto"],
+	["Subjuntivo", "Presente"],
+	["Imperativo", ""]
 ];
 
-var languagePair = [];
-var languagePairTenseNames = {};
-var hoveredWordLink;
-var openTooltips = [];
-var verbixTenseTables = [];
+
+let languagePair = [];
+let languagePairTenseNames = {};
+let hoveredWordLink;
+let openTooltips = [];
+let verbixTenseTables = [];
+
 
 $(function(){
 	languagePair = getLanguagePair();
@@ -49,38 +65,40 @@ $(function(){
 	linkWordsToVerbix();
 });
 
+
 function linkWordsToVerbix()
 {	  
-  var dictItemTableLines = $("div[id='maincontent']").find("tr" + "[id^='" + dictItemTableLineIdSuffix + "']");
-  var dictWordLinks = dictItemTableLines.find("a").filter(function(){ return $(this).text().length > 0; });
+  let dictItemTableLines = $("div[id='maincontent']").find("tr" + "[id^='" + dictItemTableLineIdSuffix + "']");
+  let dictWordLinks = dictItemTableLines.find("a").filter(() => $(this).text().length > 0);
   
   dictWordLinks.hover(createTooltip, removeTooltip);
 }
+
 
 function createTooltip()
 {
 	hoveredWordLink = $(this);
 	
-	var wordText = hoveredWordLink.text();
-	var isLeftColumn = hoveredWordLink.parent().prev().attr("class") === dictWordButtonTableClass;
+	let wordText = hoveredWordLink.text();
+	let isLeftColumn = hoveredWordLink.parent().prev().attr("class") === dictWordButtonTableClass;
 	
-	var dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
-	var verbixLanguage = verbixLanguageCodes[dictLanguage];
+	let dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
+	let verbixLanguage = verbixLanguageCodes[dictLanguage];
 	
 	if(verbixLanguage == null) return;
 	
 	loadVerbixConjugationLists(verbixLanguage, wordText);
 }
 
+
 function showTooltip()
 {		
-	console.log("Show verbix tooltip.");
-	var tooltip = $("<br /><div></div>").insertAfter(hoveredWordLink);
+	let tooltip = $("<br /><div></div>").insertAfter(hoveredWordLink);
 	openTooltips.push(tooltip);
 	
 	verbixTenseTables.forEach(function(tenseTable, index){
 		if(index > 0) tooltip.append("<br />");
-		tooltip.append("<b>" + usingTemplateTenses[index] + "</b>");
+		tooltip.append("<b>" + usingTemplateMoodTenses[index][1] + " (" + usingTemplateMoodTenses[index][0] + ")</b>");
 		tooltip.append(tenseTable);
 	});
 	
@@ -97,6 +115,7 @@ function showTooltip()
 	tooltip.animate({"opacity": "1"}, 500);
 }
 
+
 function removeTooltip()
 {
 	openTooltips.forEach(function(tooltip){
@@ -106,36 +125,45 @@ function removeTooltip()
 	verbixTenseTables = [];
 }
 
+
 function loadVerbixConjugationLists(language, verb)
 {
-	const verbixApiUrl = "https://api.verbix.com/conjugator/html";
-	const verbixTableTemplateUrl = "http://tools.verbix.com/webverbix/personal/template.htm";
+	let getQuery = "language=" + language + "&tableurl=" + verbixTableTemplateUrl + "&verb=" + verb;
+	let verbixUrl = verbixApiUrl + '?' + getQuery;
 	
-	var postLanguageArgument = verbixLanguageCodes[language];
-	var postData = "language=" + language + "&tableurl=" + verbixTableTemplateUrl + "&verb=" + verb;
-	var verbixUrl = verbixApiUrl + '?' + postData;
-	
-	GM.xmlHttpRequest({
+	GM_xmlhttpRequest({
 		method: "GET",
 		url: verbixUrl,
 		onload: function(response) {
-			var verbixContent = new DOMParser().parseFromString(response.responseText, "text/html");
+			let verbixContent = new DOMParser().parseFromString(response.responseText, "text/html");
 			
-			usingTemplateTenses.forEach(function(tenseName)
+			usingTemplateMoodTenses.forEach(function(moodTensePair)
 			{
-				var tenseTable = $(".verbtense", verbixContent).filter(isTableOfTense(tenseName)).first();
-				verbixTenseTables.push(tenseTable);
+				const mood = moodTensePair[0];
+				const tense = moodTensePair[1];
+				let moodTables = $(".verbtense", verbixContent).filter(isTableOfMood(mood));
+
+				if(moodTensePair[1] != null && moodTensePair.length > 0)
+				{
+					let tenseTable = moodTables.filter(isTableOfTense(tense));
+					verbixTenseTables.push(tenseTable);
+				}
+				else
+				{
+					verbixTenseTables.push(moodTables);
+				}
 			});			
 			showTooltip();
 		}
 	});
 }
 
+
 function getLanguagePair()
 {
-	var url = window.location.href;
-	var subdomainRegex = /^https:\/\/(?:(?:([a-z]{2})-?([a-z]{2}))|(www))\.dict\.cc\/\?s=.*/;
-	var subdomain = subdomainRegex.exec(url);
+	let url = window.location.href;
+	let subdomainRegex = /^https:\/\/(?:(?:([a-z]{2})-?([a-z]{2}))|(www))\.dict\.cc\/\?s=.*/;
+	let subdomain = subdomainRegex.exec(url);
 	
 	if(subdomain[3]) return ["en", "de"];
 	if((subdomain[1] === "de" && subdomain[2] === "en") || (subdomain[2] === "de" && subdomain[1] === "en"))
@@ -143,9 +171,9 @@ function getLanguagePair()
 		return ["en", "de"];
 	}
 	
-	isGermanWithoutEnglish = (subdomain[1] === "de" || subdomain[2] === "de");
-	isEnglishWithoutGerman = (subdomain[1] === "en" || subdomain[2] === "en");	
-	var languages = [];
+	const isGermanWithoutEnglish = (subdomain[1] === "de" || subdomain[2] === "de");
+	const isEnglishWithoutGerman = (subdomain[1] === "en" || subdomain[2] === "en");	
+	let languages = [];
 	
 	if(isGermanWithoutEnglish)
 	{
@@ -164,12 +192,11 @@ function getLanguagePair()
 	return languages;
 }
 
+
 function loadLanguagePairTenseNames(languagePair)
 {
-	const tenseNamesUrl = "https://raw.githubusercontent.com/todeit02/dict.cc_verbix_userscript/master/tense_names.json";
-	
-	$.getJSON(tenseNamesUrl, function(data) {
-		var defaultTenseNames = data["es"];
+	$.getJSON(tenseNamesUrl, data => {
+		let defaultTenseNames = data["es"];
 		
 		languagePair.forEach(function(language)
 		{
@@ -178,12 +205,29 @@ function loadLanguagePairTenseNames(languagePair)
 		});
 	});
 }
+
+
+function isTableOfMood(templateMoodName)
+{
+	return function()
+	{
+		const $moodTableDataInMain = $(this).parents("td").eq(1);
+		const $moodTableRowInMain = $moodTableDataInMain.parent();
+		const $mainTable = $moodTableRowInMain.parents("table").first();
+		const moodColIndexInMain = $moodTableDataInMain.index();
+		const moodRowIndexInMain = $moodTableRowInMain.index();
+		const heading = $("tr", $mainTable).eq(moodRowIndexInMain - 1).children().eq(moodColIndexInMain).text();
+
+		return (heading === templateMoodName);
+	}
+}
 	
+
 function isTableOfTense(templateTenseName)
 {
 	return function()
 	{
-		var parentText = $(this).parent().text();		
+		let parentText = $(this).parent().text();		
 		while(parentText.charAt(0) === '\r' || parentText.charAt(0) === '\n')
 		{
 			parentText = parentText.substr(1);
