@@ -142,7 +142,7 @@ function loadVerbixConjugationLists(dictLanguage, verb)
 				const tense = moodTensePair[1];
 				let moodTables = $(".verbtense", verbixContent).filter(isTableOfMood(mood));
 
-				if(moodTensePair[1] != null && moodTensePair.length > 0)
+				if(moodTensePair[1] != null && moodTensePair[1].length > 0)
 				{
 					const translatedTense = translateTemplateWord(dictLanguage, "tense", tense);
 					const $tenseTable = moodTables.filter(isTableOfTense(tense));

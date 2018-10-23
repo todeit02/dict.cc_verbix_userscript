@@ -39,10 +39,10 @@
 		},
 		"moods":
 		{
-			"Indicativo": "Indikativ",
-			"Subjuntivo": "Konjunktiv",
-			"Condicional": "Konditional",
-			"Imperativo": "Imperativ"
+			"Indicativo": "Indicativo",
+			"Subjuntivo": "Subjuntivo",
+			"Condicional": "Condicional",
+			"Imperativo": "Imperativo"
 		}
 	},
 	"fi": {
