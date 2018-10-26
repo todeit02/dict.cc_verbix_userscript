@@ -57,6 +57,9 @@ let templateHeadingsTranslations = {};
 let hoveredWordLink;
 let openTooltips = [];
 
+let cursorOnWordLink = false;
+let cursorOnTooltip = false;
+
 
 $(function(){
 	languagePair = getLanguagePair();
@@ -66,56 +69,101 @@ $(function(){
 
 
 function linkWordsToVerbix()
-{	  
-  let dictItemTableLines = $("div[id='maincontent']").find("tr" + "[id^='" + dictItemTableLineIdSuffix + "']");
-  let dictWordLinks = dictItemTableLines.find("a").filter(function(){ return $(this).text().length > 0; });
-  
-  dictWordLinks.hover(createTooltip, removeTooltip);
+{
+	let dictItemTableLines = $("div[id='maincontent']").find("tr" + "[id^='" + dictItemTableLineIdSuffix + "']");
+	let dictWordLinks = dictItemTableLines.find("a").filter(function(){ return $(this).text().length > 0; });
+	
+	dictWordLinks.hover(
+		(event) =>
+		{
+			console.log("hover link");
+			cursorOnWordLink = true;
+			hoveredWordLink = $(event.target).closest("a");
+			createTooltipIfNoneOpen();
+		},
+		() =>
+		{
+			console.log("unhover link");
+			cursorOnWordLink = false;
+			removeTooltipIfNotHovered();
+		});
 }
 
 
-function createTooltip()
+function createTooltipIfNoneOpen()
 {
-	hoveredWordLink = $(this);
+	console.log("createTooltipIfNoneOpen, open are: " + openTooltips.length);
+	if(openTooltips.length > 0) return;
+
+	console.log("hoveredWordLink:");
+	console.log(hoveredWordLink);
+
 	
-	let wordText = hoveredWordLink.text();
-	let isLeftColumn = hoveredWordLink.parent().prev().attr("class") === dictWordButtonTableClass;
+	let wordText = $(hoveredWordLink).text();
+	let isLeftColumn = $(hoveredWordLink).parent().prev().attr("class") === dictWordButtonTableClass;
 	
 	let dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
 	
+	console.log("Making tooltip for: " + wordText);
 	loadVerbixConjugationLists(dictLanguage, wordText);
 }
 
 
 function showTooltip(tenseTablesHtml)
 {		
-	let tooltip = $("<br /><div></div>").insertAfter(hoveredWordLink);
-	openTooltips.push(tooltip);
+	console.log("showTooltip");
+	let $tooltip = $("<br /><div></div>").appendTo(hoveredWordLink);
+	openTooltips.push($tooltip);
+	console.log($tooltip);
+
+	$tooltip.hover(() => 
+	{
+		console.log("hover tooltip");
+		cursorOnTooltip = true;
+	},
+	() =>
+	{
+		console.log("unhover tooltip");
+		cursorOnTooltip = false;
+		removeTooltipIfNotHovered();
+	});
 	
 	tenseTablesHtml.forEach(function(tenseTable, index){
-		if(index > 0) tooltip.append("<br />");
+		if(index > 0) $tooltip.append("<br />");
 
-		tooltip.append(tenseTable);
+		$tooltip.append(tenseTable);
 	});
 	
-	tooltip.css({
-		"display": "inline-block",
+	$tooltip.parent().css("position", "relative");
+	$tooltip.css({
+		"display": "initial",
 		"opacity": "0",
 		"text-align": "center",
-		"padding": "5px 0",
+		"padding": "0.5em",
 		"border-radius": "6px",
-		"position": "relative",
-		"bottom": "125%"
+		"position": "absolute",
+		"z-index": "1",
+		"background-color": "#fff",
+		"border": "1px solid black",
+		"box-shadow": "0 0 0.5em",
+		"height": "25em",
+		"overflow": "scroll",
+		"left": "99%"
 	});
-	tooltip.find("span").css("color", "black");
-	tooltip.animate({"opacity": "1"}, 500);
+	$tooltip.find("span").css("color", "black");
+	$tooltip.animate({"opacity": "1"}, 500);
 }
 
 
-function removeTooltip()
+function removeTooltipIfNotHovered()
 {
-	openTooltips.forEach(function(tooltip){
-		tooltip.remove();
+	console.log("removeTooltipIfNotHovered");
+	if(cursorOnWordLink || cursorOnTooltip) return;
+	console.log("not hovered!");
+
+	openTooltips.forEach(function($tooltip){
+		$tooltip.parent().css("position", "");
+		$tooltip.remove();
 	});
 	openTooltips = [];
 }
