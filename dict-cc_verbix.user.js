@@ -76,14 +76,12 @@ function linkWordsToVerbix()
 	dictWordLinks.hover(
 		(event) =>
 		{
-			console.log("hover link");
 			cursorOnWordLink = true;
 			hoveredWordLink = $(event.target).closest("a");
 			createTooltipIfNoneOpen();
 		},
 		() =>
 		{
-			console.log("unhover link");
 			cursorOnWordLink = false;
 			removeTooltipIfNotHovered();
 		});
@@ -92,38 +90,28 @@ function linkWordsToVerbix()
 
 function createTooltipIfNoneOpen()
 {
-	console.log("createTooltipIfNoneOpen, open are: " + openTooltips.length);
 	if(openTooltips.length > 0) return;
-
-	console.log("hoveredWordLink:");
-	console.log(hoveredWordLink);
-
 	
 	let wordText = $(hoveredWordLink).text();
 	let isLeftColumn = $(hoveredWordLink).parent().prev().attr("class") === dictWordButtonTableClass;
 	
 	let dictLanguage = isLeftColumn ? languagePair[0] :  languagePair[1];
 	
-	console.log("Making tooltip for: " + wordText);
 	loadVerbixConjugationLists(dictLanguage, wordText);
 }
 
 
 function showTooltip(tenseTablesHtml)
 {		
-	console.log("showTooltip");
 	let $tooltip = $("<br /><div></div>").appendTo(hoveredWordLink);
 	openTooltips.push($tooltip);
-	console.log($tooltip);
 
 	$tooltip.hover(() => 
 	{
-		console.log("hover tooltip");
 		cursorOnTooltip = true;
 	},
 	() =>
 	{
-		console.log("unhover tooltip");
 		cursorOnTooltip = false;
 		removeTooltipIfNotHovered();
 	});
@@ -157,9 +145,7 @@ function showTooltip(tenseTablesHtml)
 
 function removeTooltipIfNotHovered()
 {
-	console.log("removeTooltipIfNotHovered");
 	if(cursorOnWordLink || cursorOnTooltip) return;
-	console.log("not hovered!");
 
 	openTooltips.forEach(function($tooltip){
 		$tooltip.parent().css("position", "");
